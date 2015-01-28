@@ -19,14 +19,25 @@ def test(path="", options=None):
         # add options to the command list
         command.insert(1, option)
 
-    std_out, std_err, exit_code = __execute__(command)
-
-    if std_err:
-        # exit if there is an error
-        print std_err
-        raise SystemExit
+    std_out, exit_code = __execute__(command)
 
     return exit_code
+
+
+def ls(path=None, output=None):
+
+    # command
+    command = ["-ls"]
+
+    if path:
+        command.append(path)
+
+    std_out, exit_code = __execute__(command)
+
+    if output == 'stdout':
+        return std_out
+    else:
+        return std_out.split()[2::8][1:]
 
 
 def __execute__(command):
@@ -39,13 +50,25 @@ def __execute__(command):
     hdfs_cmd = subprocess.Popen(hdfs_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     std_out, std_err = hdfs_cmd.communicate()
     exit_code = hdfs_cmd.returncode
-    return std_out, std_err, exit_code
+
+    if std_err:
+        # exit if there is an error
+        print std_err
+        raise SystemExit
+
+    return std_out, exit_code
 
 
 if __name__ == '__main__':
 
-    print "HDFS Command: test"
+    print "\nHDFS Command: test"
     assert test("temp", "e") == 0
     print "[x] passed true directory test"
     assert test("abc", "e") == 1
     print "[x] passed false directory test"
+
+    print "\nHDFS Command: ls"
+    assert len(ls("algorithms")) == 2
+    print "[x] passed true directory contents test"
+    assert type(ls("algorithms", output='stdout')) == str
+    print "[x] passed true directory stdout test"
