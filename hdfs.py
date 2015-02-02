@@ -54,11 +54,34 @@ def count(path, output=None):
         return int(results[0]), int(results[1]), int(results[2]), results[3]
 
 
-def mkdir(*path):
+def mkdir(path, options=None):
+
+    # assert (type(path) == str) or (type(path) == list), "path must either be a string or list of strings."
 
     # command
     command = ["-mkdir"]
-    command.extend(list(path))
+
+    if type(path) == str:
+        command.append(path)
+    else:
+        command.extend(path)
+
+    # command options
+    option = {"p": "-p"}.get(options, None)
+
+    if option:
+        # add options to the command list
+        command.insert(1, option)
+
+    std_out, exit_code = __execute__(command)
+
+    return exit_code
+
+
+def mv(path_source, path_destination):
+
+    # command
+    command = ["-mv", path_source, path_destination]
 
     std_out, exit_code = __execute__(command)
 
@@ -102,5 +125,9 @@ if __name__ == '__main__':
     print count("algorithms")
 
     print "\nHDFS Command: mkdir"
-    # print mkdir("test")
-    # print mkdir("test1", "test2", "test3")
+    print mkdir("test")
+    print mkdir("test1/test2", options="p")
+
+    print "\nHDFS Command: mv"
+    print mv("test", "test_moved")
+    print mv("test", "test_moved")
