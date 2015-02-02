@@ -65,6 +65,16 @@ def mkdir(*path):
     return exit_code
 
 
+def mv(path_source, path_destination):
+
+    # command
+    command = ["-mv", path_source, path_destination]
+
+    std_out, exit_code = __execute__(command)
+
+    return exit_code
+
+
 def __execute__(command):
 
     # hdfs command
@@ -102,5 +112,9 @@ if __name__ == '__main__':
     print count("algorithms")
 
     print "\nHDFS Command: mkdir"
-    # print mkdir("test")
+    print mkdir("test")
     # print mkdir("test1", "test2", "test3")
+
+    print "\nHDFS Command: mv"
+    print mv("test", "test_moved")
+    print mv("test", "test_moved")
