@@ -54,6 +54,17 @@ def count(path, output=None):
         return int(results[0]), int(results[1]), int(results[2]), results[3]
 
 
+def mkdir(*path):
+
+    # command
+    command = ["-mkdir"]
+    command.extend(list(path))
+
+    std_out, exit_code = __execute__(command)
+
+    return exit_code
+
+
 def __execute__(command):
 
     # hdfs command
@@ -89,3 +100,7 @@ if __name__ == '__main__':
 
     print "\nHDFS Command: count"
     print count("algorithms")
+
+    print "\nHDFS Command: mkdir"
+    # print mkdir("test")
+    # print mkdir("test1", "test2", "test3")
