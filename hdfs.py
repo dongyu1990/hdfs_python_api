@@ -40,6 +40,20 @@ def ls(path=None, output=None):
         return std_out.split()[2::8][1:]
 
 
+def count(path, output=None):
+
+    # command
+    command = ["-count", path]
+
+    std_out, exit_code = __execute__(command)
+
+    if output == 'stdout':
+        return std_out
+    else:
+        results = std_out.split()
+        return int(results[0]), int(results[1]), int(results[2]), results[3]
+
+
 def __execute__(command):
 
     # hdfs command
@@ -72,3 +86,6 @@ if __name__ == '__main__':
     print "[x] passed true directory contents test"
     assert type(ls("algorithms", output='stdout')) == str
     print "[x] passed true directory stdout test"
+
+    print "\nHDFS Command: count"
+    print count("algorithms")
