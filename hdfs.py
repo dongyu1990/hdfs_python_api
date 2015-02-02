@@ -78,10 +78,24 @@ def mkdir(path, options=None):
     return exit_code
 
 
-def mv(path_source, path_destination):
+def rm(path, options=None):
+
+    # assert (type(path) == str) or (type(path) == list), "path must either be a string or list of strings."
 
     # command
-    command = ["-mv", path_source, path_destination]
+    command = ["-rm"]
+
+    if type(path) == str:
+        command.append(path)
+    else:
+        command.extend(path)
+
+    # command options
+    option = {"r": "-r"}.get(options, None)
+
+    if option:
+        # add options to the command list
+        command.insert(1, option)
 
     std_out, exit_code = __execute__(command)
 
@@ -109,7 +123,7 @@ def __execute__(command):
     std_out, std_err = hdfs_cmd.communicate()
     exit_code = hdfs_cmd.returncode
 
-    if std_err:
+    if std_err and exit_code < 0:
         # exit if there is an error
         print std_err
         raise SystemExit
@@ -136,12 +150,11 @@ if __name__ == '__main__':
 
     print "\nHDFS Command: mkdir"
     print mkdir("test")
-<<<<<<< HEAD
-    # print mkdir("test1", "test2", "test3")
-=======
     print mkdir("test1/test2", options="p")
->>>>>>> hdfs_mkdir
 
     print "\nHDFS Command: mv"
     print mv("test", "test_moved")
-    print mv("test", "test_moved")
+
+    print "\nHDFS Command: rm"
+    print rm("test_moved", options="r")
+    print rm("test1", options="r")
