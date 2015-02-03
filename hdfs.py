@@ -149,12 +149,17 @@ if __name__ == '__main__':
     print count("algorithms")
 
     print "\nHDFS Command: mkdir"
-    print mkdir("test")
-    print mkdir("test1/test2", options="p")
+    assert mkdir("test") == 0
+    print "[x] passed true directory creation test"
+    assert mkdir("test1/test2", options="p") == 0
+    print "[x] passed true directory structure creation test"
 
     print "\nHDFS Command: mv"
-    print mv("test", "test_moved")
+    assert mv("test", "test_moved") == 0
+    print "[x] passed true move directory test"
 
     print "\nHDFS Command: rm"
-    print rm("test_moved", options="r")
-    print rm("test1", options="r")
+    assert rm("test_moved", options="r") == 0
+    print "[x] passed delete directory test"
+    assert rm("test1", options="r") == 0
+    print "[x] passed delete directory structure test"
