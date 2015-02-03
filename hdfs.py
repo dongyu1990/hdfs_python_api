@@ -3,39 +3,16 @@
 import subprocess
 
 
-def test(path="", options=None):
-
-    # command
-    command = ["-test", path]
-
-    # command options
-    option = {"e": "-e",
-              "f": "-f",
-              "z": "-z",
-              "s": "-s",
-              "d": "-d"}.get(options, None)
-
-    if option:
-        # add options to the command list
-        command.insert(1, option)
-
-    std_out, std_err, exit_code = __execute__(command)
-
-    return exit_code
-
-
 def ls(path=None, output=None):
 
     # command
     command = ["-ls"]
 
-    if path:
-        command.append(path)
+    command.extend(__paths_type_check__(path))
 
     std_out, std_err, exit_code = __execute__(command)
 
     if exit_code == 1:
-        # print std_err
         return None
     else:
         results = std_out.split()
@@ -51,7 +28,9 @@ def ls(path=None, output=None):
 def count(path, output=None):
 
     # command
-    command = ["-count", path]
+    command = ["-count"]
+
+    command.extend(__paths_type_check__(path))
 
     std_out, std_err, exit_code = __execute__(command)
 
@@ -62,75 +41,62 @@ def count(path, output=None):
         return int(results[0]), int(results[1]), int(results[2]), results[3]
 
 
-def mkdir(path, options=None):
+def mv(path_source, path_destination):
 
-    # assert (type(path) == str) or (type(path) == list), "path must either be a string or list of strings."
+    # command
+    command = ["-mv"]
+
+    command.extend(__paths_type_check__(path_source))
+    command.extend(__paths_type_check__(path_destination))
+
+    std_out, std_err, exit_code = __execute__(command)
+
+    return exit_code
+
+
+def mkdir(paths, options=None):
 
     # command
     command = ["-mkdir"]
 
-    if type(path) == str:
-        command.append(path)
-    else:
-        command.extend(path)
-
     # command options
-    option = {"p": "-p"}.get(options, None)
+    command_options = {"p": "-p"}
 
-    if option:
-        # add options to the command list
-        command.insert(1, option)
+    if options:
+        command.extend(__add_options__(options, command_options))
+
+    command.extend(__paths_type_check__(paths))
 
     std_out, std_err, exit_code = __execute__(command)
 
     return exit_code
 
 
-def rm(path, options=None):
-
-    assert (type(path) == str) or (type(path) == list), "path must either be a string or list of strings."
+def rm(paths, options=None):
 
     # command
     command = ["-rm"]
 
-    if type(path) == str:
-        command.append(path)
-    else:
-        command.extend(path)
-
     # command options
-    option = {"r": "-r"}.get(options, None)
+    command_options = {"r": "-r",
+                       "f": "-f"}
 
-    if option:
-        # add options to the command list
-        command.insert(1, option)
+    if options:
+        command.extend(__add_options__(options, command_options))
 
-    std_out, std_err, exit_code = __execute__(command)
-
-    return exit_code
-
-
-def mv(path_source, path_destination):
-
-    # command
-    command = ["-mv", path_source, path_destination]
+    command.extend(__paths_type_check__(paths))
 
     std_out, std_err, exit_code = __execute__(command)
 
     return exit_code
 
 
-def put(path_source, path_destination=None):
-
-    assert (type(path_source) == str) or (type(path_source) == list), "path must either be a string or list of strings."
+def put(paths_source, path_destination=None):
 
     # command
     command = ["-put"]
 
-    if type(path_source) == str:
-        command.append(path_source)
-    else:
-        command.extend(path_source)
+    command.extend(__paths_type_check__(paths_source))
 
     if path_destination:
         command.append(path_destination)
@@ -142,11 +108,59 @@ def put(path_source, path_destination=None):
     return exit_code
 
 
+def test(path="", options=None):
+
+    # command
+    command = ["-test"]
+
+    # command options
+    command_options = {"e": "-e",
+                       "f": "-f",
+                       "z": "-z",
+                       "s": "-s",
+                       "d": "-d"}
+
+    if options:
+        command.extend(__add_options__(options, command_options))
+
+    command.extend(__paths_type_check__(path))
+
+    std_out, std_err, exit_code = __execute__(command)
+
+    return exit_code
+
+
+def __paths_type_check__(paths):
+
+    command = []
+
+    if isinstance(paths, basestring):
+        command.append(paths)
+    elif all(isinstance(path, basestring) for path in paths):
+        command.extend(paths)
+    else:
+        raise TypeError("path must either be a string or a list of strings", paths)
+
+    return command
+
+
+def __add_options__(options, command_options):
+
+    cmd_options = []
+
+    for option in options:
+        cmd_options.append(command_options.get(option))
+
+    return filter(None, cmd_options)
+
+
 def __execute__(command):
 
     # hdfs command
     hdfs_command = ["hdfs", "dfs"]
     hdfs_command.extend(command)
+
+    print hdfs_command
 
     # run command
     hdfs_cmd = subprocess.Popen(hdfs_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
