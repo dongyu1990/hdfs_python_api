@@ -80,7 +80,7 @@ def mkdir(path, options=None):
 
 def rm(path, options=None):
 
-    # assert (type(path) == str) or (type(path) == list), "path must either be a string or list of strings."
+    assert (type(path) == str) or (type(path) == list), "path must either be a string or list of strings."
 
     # command
     command = ["-rm"]
@@ -112,11 +112,35 @@ def mv(path_source, path_destination):
     return exit_code
 
 
+def put(path_source, path_destination=None):
+
+    assert (type(path_source) == str) or (type(path_source) == list), "path must either be a string or list of strings."
+
+    # command
+    command = ["-put"]
+
+    if type(path_source) == str:
+        command.append(path_source)
+    else:
+        command.extend(path_source)
+
+    if path_destination:
+        command.append(path_destination)
+    else:
+        command.append(".")
+
+    std_out, exit_code = __execute__(command)
+
+    return exit_code
+
+
 def __execute__(command):
 
     # hdfs command
     hdfs_command = ["hdfs", "dfs"]
     hdfs_command.extend(command)
+
+    print hdfs_command
 
     # run command
     hdfs_cmd = subprocess.Popen(hdfs_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -163,3 +187,9 @@ if __name__ == '__main__':
     print "[x] passed delete directory test"
     assert rm("test1", options="r") == 0
     print "[x] passed delete directory structure test"
+
+    print "\nHDFS Command: put"
+    assert put("testfile") == 0
+    assert put(["testfile1", "testfile2"]) == 0
+    rm("test*")
+
