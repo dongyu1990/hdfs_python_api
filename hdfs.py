@@ -130,6 +130,36 @@ def test(path="", options=None):
     return exit_code
 
 
+def tail(path, options=None):
+
+    # command
+    command = ["-tail"]
+
+    # command options
+    command_options = {"f": "-f"}
+
+    if options:
+        command.extend(__add_options__(options, command_options))
+
+    command.extend(__paths_type_check__(path))
+
+    std_out, std_err, exit_code = __execute__(command)
+
+    return exit_code
+
+
+def touchz(path):
+
+    # command
+    command = ["-touchz"]
+
+    command.extend(__paths_type_check__(path))
+
+    std_out, std_err, exit_code = __execute__(command)
+
+    return exit_code
+
+
 def __paths_type_check__(paths):
 
     command = []
